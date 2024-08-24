@@ -7,6 +7,7 @@ import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
+import {formatBills} from "../containers/Bills.js"
 
 import router from "../app/Router.js";
 
@@ -29,9 +30,19 @@ describe("Given I am connected as an employee", () => {
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills })
-      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
+      const sortedBills = formatBills(bills)
+      document.body.innerHTML = BillsUI({ data: sortedBills })
+      const dates = screen.getAllByText(/^\d{1,2} (Jan.|Fév.|Mar.|Avr.|Mai|Juin|Juil.|Aoû.|Sep.|Oct.|Nov.|Déc.) \d{2}$/i).map(a => a.innerHTML);
+      const antiChrono = (a, b) => {
+          const parseDate = (dateStr) => {
+              const [day, month, year] = dateStr.split(' ');
+              const monthIndex = [
+                  "Jan.", "Fév.", "Mar.", "Avr.", "Mai", "Juin", "Juil.", "Aoû.", "Sep.", "Oct.", "Nov.", "Déc."
+              ].indexOf(month);
+              return new Date(`20${year}`, monthIndex, day);
+          };
+          return parseDate(b) - parseDate(a);
+      };
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
