@@ -23,7 +23,7 @@ export const formatBills = (snapshot) => {
         }
       }
     })
-  console.log('length', bills.length)
+  // console.log('length', bills.length)
   return bills
 }
 
