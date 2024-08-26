@@ -18,8 +18,7 @@ export default class NewBill {
 
   handleChangeFile = e => {
     e.preventDefault()
-    const filePath = e.target.value.split(/\\/g)
-    this.fileName = filePath[filePath.length-1]
+    this.fileName = e.target.files[0].name
     const validExtensions = ['.png', '.jpg', '.jpeg']
     const fileExtension = this.fileName.slice(this.fileName.lastIndexOf('.')).toLowerCase()
     if (!validExtensions.includes(fileExtension)) {
@@ -35,13 +34,13 @@ export default class NewBill {
 
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const email = JSON.parse(localStorage.getItem("user")).email
-    const type = e.target.querySelector(`select[data-testid="expense-type"]`).value
-    const name = e.target.querySelector(`input[data-testid="expense-name"]`).value
-    const amount = parseInt(e.target.querySelector(`input[data-testid="amount"]`).value)
-    const date = e.target.querySelector(`input[data-testid="datepicker"]`).value
-    const vat = e.target.querySelector(`input[data-testid="vat"]`).value
-    const pct = parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20
-    const commentary = e.target.querySelector(`textarea[data-testid="commentary"]`).value
+    const type = $(`select[data-testid="expense-type"]`).val()
+    const name = $(`input[data-testid="expense-name"]`).val()
+    const amount = parseInt($(`input[data-testid="amount"]`).val())
+    const date = $(`input[data-testid="datepicker"]`).val()
+    const vat = $(`input[data-testid="vat"]`).val()
+    const pct = parseInt($(`input[data-testid="pct"]`).val()) || 20
+    const commentary = $(`textarea[data-testid="commentary"]`).val()
     const status = 'pending'
 
     const bill = new FormData()
@@ -62,21 +61,23 @@ export default class NewBill {
 
   // not need to cover this function by tests
   createBill = (bill) => {
-    this.store
-    .bills()
-    .create({
-      data: bill,
-      headers: {
-        noContentType: true
-      }
-    })
-    .then(({fileUrl, key}) => {
-      // console.log(fileUrl)
-      // console.log(key)
-      this.billId = key
-      this.fileUrl = fileUrl
-      this.onNavigate(ROUTES_PATH['Bills'])
-    })
-    .catch(error => console.error(error))
+    if (this.store) {
+      return this.store
+      .bills()
+      .create({
+        data: bill,
+        headers: {
+          noContentType: true
+        }
+      })
+      .then(({fileUrl, key}) => {
+        // console.log(fileUrl)
+        // console.log(key)
+        this.billId = key
+        this.fileUrl = fileUrl
+        this.onNavigate(ROUTES_PATH['Bills'])
+      })
+      .catch(error => console.error(error))
+    }
   }
 }

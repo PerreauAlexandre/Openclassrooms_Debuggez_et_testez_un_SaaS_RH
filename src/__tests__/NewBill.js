@@ -8,12 +8,15 @@ import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes"
 import {localStorageMock} from "../__mocks__/localStorage.js"
+import mockStore from "../__mocks__/store"
 import router from "../app/Router.js"
 
+jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
     beforeEach(() => {
+      document.body.innerHTML = ''
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -33,50 +36,44 @@ describe("Given I am connected as an employee", () => {
       const windowIcon = screen.getByTestId('icon-mail')
       expect(windowIcon.className).toContain('active-icon')
     })
-    test("Then I should be able to select a file with a valid extension", async () => {
+    test("Then I should be able to select a file with a valid extension", () => {
       const newBill = new NewBill({ document, onNavigate, store: null, localStorage: window.localStorage })
       const fileInput = screen.getByTestId('file')
-      const file = new File(['test'], 'test.png', { type: 'image/png' })
-
-      await userEvent.upload(fileInput, file)
-
-      console.log('fileInput.files:', fileInput.files[0])
+      const file = new File(['test'], 'test.png', { type: 'application/pdf' })
 
       const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
       fileInput.addEventListener('change', handleChangeFile)
-      fireEvent.change(fileInput)
+
+      userEvent.upload(fileInput, file)
 
       expect(handleChangeFile).toHaveBeenCalled()
       expect(newBill.fileName).toBe('test.png')
     })
+    test("Then I should be able to submit the form", async () => {
+      const newBill = new NewBill({ document, onNavigate, store: null, localStorage: window.localStorage })
+
+      const fileInput = screen.getByTestId('file')
+      const file = new File(['test'], 'test.png', { type: 'application/pdf' })
+
+      userEvent.upload(fileInput, file)
+      userEvent.type(screen.getByTestId('expense-name'), 'Test Expense')
+      userEvent.type(screen.getByTestId('amount'), '100')
+      userEvent.type(screen.getByTestId('datepicker'), '2024-08-25')
+      userEvent.type(screen.getByTestId('vat'), '20')
+      userEvent.type(screen.getByTestId('pct'), '10')
+      userEvent.type(screen.getByTestId('commentary'), 'Test commentary')
+      userEvent.selectOptions(screen.getByTestId('expense-type'), 'Restaurants et bars')
+
+      const sendButton = screen.getByTestId("btn-send-bill")
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      sendButton.addEventListener("click", handleSubmit)
+      userEvent.click(sendButton)
+      expect(handleSubmit).toHaveBeenCalled()
+      await waitFor(() => screen.getByTestId('employee-content'))
+      const employeeContent = screen.queryByTestId('employee-content')
+      expect(employeeContent).toBeTruthy()    
+    })
   })
-  // describe("When I am on NewBill Page and add a file", () => {
-  //   test("File format should be tested", async () => {
-  //     // A compléter
-  //     // 
-  //     // 
-  //     // 
-  //     // 
-  //     // 
-  //   })
-  // })
-  // describe("When I am on NewBill Page and add a new bill", () => {
-  //   test("New bill should be created", async () => {
-  //     const onNavigate = (pathname) => {
-  //       document.body.innerHTML = ROUTES({ pathname })
-  //     }
-
-  //     Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  //     window.localStorage.setItem('user', JSON.stringify({
-  //       type: 'Admin'
-  //     }))
-
-  //     const dashboard = new NewBill({
-  //       document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
-  //     })
-  //     document.body.innerHTML = DashboardUI({ data: { bills } })
-  //   })
-  // })
 })
 
 

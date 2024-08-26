@@ -75,7 +75,7 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe('When I am on bill page and I click on a icon eye', () => {
-    test('A modal should open', () => {
+    test('Then, a modal should open', () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
