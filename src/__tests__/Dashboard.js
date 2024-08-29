@@ -257,6 +257,7 @@ describe("Given I am a user connected as Admin", () => {
       expect(contentRefused).toBeTruthy()
       expect(screen.getByTestId("big-billed-icon")).toBeTruthy()
     })
+  })
   describe("When an error occurs on API", () => {
     beforeEach(() => {
       jest.spyOn(mockStore, "bills")
@@ -302,8 +303,6 @@ describe("Given I am a user connected as Admin", () => {
       const message = await screen.getByText(/Erreur 500/)
       expect(message).toBeTruthy()
     })
-  })
-
   })
 })
 

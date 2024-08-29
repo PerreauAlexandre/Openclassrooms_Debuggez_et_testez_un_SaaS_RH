@@ -119,7 +119,7 @@ describe("Given I am a user connected as Employee", () => {
       const contentPending  = await screen.getByText("Mes notes de frais")
       expect(contentPending).toBeTruthy()
       const tableBody = screen.getByTestId('tbody')
-      expect(tableBody.children.length).toBe(4)  
+      expect(tableBody.children.length).toBe(4)
     })
   describe("When an error occurs on API", () => {
     beforeEach(() => {

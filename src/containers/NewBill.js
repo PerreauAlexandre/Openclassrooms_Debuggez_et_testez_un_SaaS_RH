@@ -18,12 +18,13 @@ export default class NewBill {
 
   handleChangeFile = e => {
     e.preventDefault()
-    this.fileName = e.target.files[0].name
+    const file = this.document.querySelector(`input[data-testid="file"]`)
+    this.fileName = file.files[0].name
     const validExtensions = ['.png', '.jpg', '.jpeg']
     const fileExtension = this.fileName.slice(this.fileName.lastIndexOf('.')).toLowerCase()
     if (!validExtensions.includes(fileExtension)) {
         alert('Veuillez sélectionner un fichier de type .png, .jpg ou .jpeg.')
-        e.target.value = ""
+        file.value = ''
         return
     }
   }
@@ -46,14 +47,14 @@ export default class NewBill {
     const bill = new FormData()
     bill.append('file', file)
     bill.append('email', email)
-    bill.append('type', type);
-    bill.append('name', name);
-    bill.append('amount', amount);
-    bill.append('date', date);
-    bill.append('vat', vat);
-    bill.append('pct', pct);
-    bill.append('commentary', commentary);
-    bill.append('status', status);
+    bill.append('type', type)
+    bill.append('name', name)
+    bill.append('amount', amount)
+    bill.append('date', date)
+    bill.append('vat', vat)
+    bill.append('pct', pct)
+    bill.append('commentary', commentary)
+    bill.append('status', status)
 
     this.createBill(bill)
     this.onNavigate(ROUTES_PATH['Bills'])
